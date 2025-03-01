@@ -1,7 +1,6 @@
 import { Star } from "lucide-react";
 
 export default function Stars ({rating}) {
-    console.log(rating)
     const maxStars=5;
     return (
         <div className="flex space-x-1">
