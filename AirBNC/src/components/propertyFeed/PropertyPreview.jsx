@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Stars from "./Stars";
 import { useNavigate } from "react-router-dom";
-import Property from '../../components/property/Property';
 
 export default function PropertyPreview ({property,reviewFilter}) {
     const [reviews,setReviews] = useState(0);
@@ -39,7 +38,7 @@ export default function PropertyPreview ({property,reviewFilter}) {
       }
 
       const handleButtonClick = () => {
-        navigate(`/property/${property.property_id}`,{ state: { property } });
+        navigate(`/property/${property.property_id}`)
       };
     
 
@@ -51,8 +50,8 @@ export default function PropertyPreview ({property,reviewFilter}) {
             <div className="property-description">
                 <h5 style={{ textAlign: "left" }}>{property.property_name}</h5>
                 <p>{property.property_type}</p>
-                <Stars rating={reviews}/>
                 </div>
+                {reviews !== 0 && <Stars rating={reviews} editable={false} />}
             <div><p>£{property.price_per_night}</p></div>
             
         </div>
