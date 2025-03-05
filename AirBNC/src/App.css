@@ -409,3 +409,18 @@ input[type="number"] {
 .review-input.has-comment::placeholder {
   color: white; /* Adjust this to your desired color */
 }
+
+
+.heart {
+  font-size: 30px;
+  border-color: gray;
+  transition: color 0.2s ease-in-out;
+  position: relative;
+  top: 50%;
+  transform: translateX(-100px) translateY(-95px);
+  cursor: pointer;
+}
+
+.heart.favourited {
+  color: red;
+}

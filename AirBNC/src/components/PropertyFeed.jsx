@@ -4,12 +4,15 @@ import PropertyPreview from "./propertyFeed/PropertyPreview";
 import SearchControls from "./search/SearchControls";
 import SearchFilter from "./search/SearchFilter";
 import SortBy from "./search/SortBy";
+import { useUser } from "./UserContext"
 
 export default function PropertyFeed () {
     const [properties,setProperties] = useState([]);
     const [searchParameters,setSearchParameters] = useState({});
     const [loading,setLoading] = useState(true);
     const [reviewFilter,setReviewFilter] = useState(null);
+    const { user, setUser } = useUser();
+    const [favouritesOnly, setFavouritesOnly] = useState(false);
 
 
     useEffect(()=>{
@@ -18,7 +21,6 @@ export default function PropertyFeed () {
             let apiURL = "https://jl-air-bnc.onrender.com/api/properties/";
             let urlAdditions = ""
             if (Object.keys(searchParameters).length>0){
-                console.log(searchParameters)
                 urlAdditions = `?minprice=${searchParameters.minprice}&maxprice=${searchParameters.maxprice}`
                 switch (searchParameters.sort_by){
                     case "Price per Night Desc":
@@ -45,25 +47,35 @@ export default function PropertyFeed () {
             }
             }
             try{
-                console.log(apiURL);
                 const response = await axios.get(apiURL);
-                setProperties(response.data.properties)
-                setLoading(false);
+                let fetchedProperties = response.data.properties;
+
+                const favResponse = await axios.get(`https://jl-air-bnc.onrender.com/api/users/${user.userID}/favourites`);
+                const favList = favResponse.data.favourites;
+
+                const propertiesWithFavourites = fetchedProperties.map((property) => {
+                    const fav = favList.find((fav) => fav.property_id === property.property_id);
+                    return {
+                      ...property,
+                      favourited: fav ? fav.favourite_id : false,
+                    };
+                  });
+
+                setProperties(propertiesWithFavourites);
             } catch (error) {
                 console.error("Error fetching items:", error);
-              }
+            } finally {
+                setLoading(false);
+            }
         }
         fetchProperties();
     },[searchParameters])
 
-    useEffect(()=>{
-        console.log(searchParameters);
-    },[searchParameters]);
     return (
         <div>
             <h1>Properties</h1>
             <SearchControls>
-                <SearchFilter setSearchParameters={setSearchParameters}/>
+                <SearchFilter setSearchParameters={setSearchParameters} setFavouritesOnly={setFavouritesOnly}/>
                 <SortBy/>
             </SearchControls>
             <div className="list-header">
@@ -77,7 +89,7 @@ export default function PropertyFeed () {
                         <h4>No Properties found, please change search parameters.</h4>
                     ):
                     properties.map((property)=>
-                <PropertyPreview property={property} reviewFilter={reviewFilter}/>)}
+                <PropertyPreview property={property} reviewFilter={reviewFilter} favouritesOnly={favouritesOnly}/>)}
             </div>
         </div>
     )
