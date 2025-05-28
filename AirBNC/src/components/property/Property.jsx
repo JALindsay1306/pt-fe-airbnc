@@ -5,6 +5,7 @@ import ImageGallery from "./ImageGallery";
 import Stars from "../propertyFeed/Stars";
 import { useNavigate } from "react-router-dom";
 import PostReview from "../PostReview";
+import CreateBooking from "./CreateBooking";
 
 
 export default function Property () {
@@ -46,8 +47,35 @@ export default function Property () {
       getReviews(id)
     },[])
 
+    const handleToggleFavourite = async (e) => {
+      console.log({guest_id:[user.userID]})
+      e.stopPropagation();
+      setIsFavourited((prev) => !prev);
+      try {
+        if(isFavourited){
+        await axios.delete(`https://jl-air-bnc.onrender.com/api/favourites/${property.favourited}`)
+      } else {
+        await axios.post(`https://jl-air-bnc.onrender.com/api/properties/${property.property_id}/favourite`,{guest_id:user.userID})
+      }
+    } catch (error) {
+      console.error("Error toggling favourite:", error);
+      if (error.response && error.response.status === 404) {
+        setIsFavourited(false);
+      } else if (error.response && error.response.data.msg === 'You have already favourited this property') {
+          setIsFavourited(true);
+        }else {
+        setIsFavourited((prev) => !prev);
+      }
+
+    }
+    }
+
     const handleReviewsClick = () => {
       navigate(`/property/${id}/reviews`);
+    };
+
+    const handleBookClick = () => {
+      navigate(`/property/${id}/create-booking`);
     };
 
     useEffect(()=>{
@@ -74,8 +102,8 @@ export default function Property () {
         <ImageGallery images={property.images}/>
         <p>{property.description}</p>
         <div><h5>£{property.price_per_night}</h5></div>
-        <button>Favourite</button>
-        <button>Book</button>
+        <button onClick={handleToggleFavourite}>Favourite</button>
+        <button onClick={handleBookClick}>Book</button>
         <div className="stars-container" onClick={() => handleRatingChange()}>
         {reviews.average_rating !== 0 && (
           <Stars

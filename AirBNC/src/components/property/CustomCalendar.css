@@ -1,0 +1,51 @@
+.rdrCalendarWrapper .rdrDayDisabled {
+  background-color: lightgrey;
+}
+
+.user-booked-date {
+  background-color: #c6f6d5;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  opacity: 0.8;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.user-booked-date:hover {
+  background-color: #9ae6b4;
+}
+
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: max-content;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  position: absolute;
+  z-index: 1;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}

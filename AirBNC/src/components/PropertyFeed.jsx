@@ -5,6 +5,8 @@ import SearchControls from "./search/SearchControls";
 import SearchFilter from "./search/SearchFilter";
 import SortBy from "./search/SortBy";
 import { useUser } from "./UserContext"
+import NavBar from "./NavBar";
+import CreateBooking from "./property/CreateBooking";
 
 export default function PropertyFeed () {
     const [properties,setProperties] = useState([]);
@@ -73,6 +75,7 @@ export default function PropertyFeed () {
 
     return (
         <div>
+            <NavBar/>
             <h1>Properties</h1>
             <SearchControls>
                 <SearchFilter setSearchParameters={setSearchParameters} setFavouritesOnly={setFavouritesOnly}/>
