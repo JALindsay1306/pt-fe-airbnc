@@ -7,6 +7,7 @@ import SortBy from "./search/SortBy";
 import { useUser } from "./UserContext"
 import NavBar from "./NavBar";
 import CreateBooking from "./property/CreateBooking";
+import { Link } from 'react-router-dom';
 
 export default function PropertyFeed () {
     const [properties,setProperties] = useState([]);
@@ -77,6 +78,7 @@ export default function PropertyFeed () {
         <div>
             <NavBar/>
             <h1>Properties</h1>
+            <Link to="/mybookings">Go to My Bookings</Link> 
             <SearchControls>
                 <SearchFilter setSearchParameters={setSearchParameters} setFavouritesOnly={setFavouritesOnly}/>
                 <SortBy/>
@@ -94,6 +96,9 @@ export default function PropertyFeed () {
                     properties.map((property)=>
                 <PropertyPreview property={property} reviewFilter={reviewFilter} favouritesOnly={favouritesOnly}/>)}
             </div>
+            
+
+        
         </div>
     )
 }

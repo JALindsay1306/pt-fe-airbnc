@@ -8,8 +8,10 @@ import { UserProvider } from './components/UserContext';
 import PostReview from './components/PostReview';
 import Favourites from './components/Favourites';
 import CreateBooking from './components/property/CreateBooking';
+import MyBookings from './components/user/MyBookings';
 import axios from 'axios';
 import NavBar from './components/NavBar';
+
 
 
 function App() {
@@ -24,7 +26,8 @@ function App() {
             <Route path="/property/:id/reviews" element={<ReviewFeed/>} />
             <Route path="/favourites" element={<Favourites/>} />
             <Route path="/property/:id/post-review" element={<PostReview/>} />
-            <Route path="/property/:id/create-booking" element={<CreateBooking/>} />      
+            <Route path="/property/:id/create-booking" element={<CreateBooking/>} />
+            <Route path="/mybookings" element = {<MyBookings/>} />
           </Routes>
     </UserProvider>
   )

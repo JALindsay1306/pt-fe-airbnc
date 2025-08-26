@@ -5,9 +5,11 @@ import 'react-date-range/dist/theme/default.css';
 import './CustomCalendar.css';
 import { addDays, isWithinInterval } from 'date-fns';
 import axios from 'axios';
-import { useUser } from "../UserContext"
+import { useUser } from "./UserContext"
 
 const BookingCalendar = ({property}) => {
+  let calendarType = "property";
+  if (!property){calendarType="user"};
   const { user, setUser } = useUser();
   const [selectionRange, setSelectionRange] = useState({
     startDate: new Date(),
@@ -22,12 +24,13 @@ const BookingCalendar = ({property}) => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const res = await axios.get(`https://jl-air-bnc.onrender.com/api/properties/${property}/booking`);
-        const userRes = await axios.get(`https://jl-air-bnc.onrender.com/api/users/${user.userID}/bookings`);
+        let dates = [];
+        if(calendarType == "property"){
+          const res = await axios.get(`https://jl-air-bnc.onrender.com/api/properties/${property}/booking`);
+              
+          setBookings(res.data.bookings);
 
-        setBookings(res.data.bookings);
-
-        const dates = res.data.bookings.flatMap(booking => {
+          dates = res.data.bookings.flatMap(booking => {
           const start = new Date(booking.check_in_date);
           const end = new Date(booking.check_out_date);
           const dateArray = [];
@@ -37,27 +40,28 @@ const BookingCalendar = ({property}) => {
             current.setDate(current.getDate() + 1);
           }
           return dateArray;
-        });
+          });
+        };
+      const userRes = await axios.get(`https://jl-air-bnc.onrender.com/api/users/${user.userID}/bookings`);
 
-
-        const userBookingDates = userRes.data.bookings.flatMap(booking => {
-          const start = new Date(booking.check_in_date);
-          const end = new Date(booking.check_out_date);
-          const dateArray = [];
-          let current = new Date(start);
+      const userBookingDates = userRes.data.bookings.flatMap(booking => {
+        const start = new Date(booking.check_in_date);
+        const end = new Date(booking.check_out_date);
+        const dateArray = [];
+        let current = new Date(start);
           while (current <= end) {
             dateArray.push({ date: new Date(current), bookingId: booking.booking_id });
             current.setDate(current.getDate() + 1);
           }
           return dateArray;
-        });
+      });
 
 
-        setDisabledDates([
-          ...dates,
-          ...userBookingDates.map(d => d.date),
-        ]);
-        setUserBookings(userBookingDates);
+      setDisabledDates([
+        ...dates,
+        ...userBookingDates.map(d => d.date),
+      ]);
+      setUserBookings(userBookingDates);
       } catch (error) {
         console.error('Failed to fetch bookings', error);
       }
@@ -81,8 +85,7 @@ const BookingCalendar = ({property}) => {
     axios.delete(`https://jl-air-bnc.onrender.com/api/bookings/${bookingId}`)
       .then(() => {
         alert('Booking cancelled');
-        // Re-fetch bookings or update state
-        window.location.reload(); // Or refetch state
+        window.location.reload(); 
       })
       .catch((err) => {
         console.error(err);
@@ -121,11 +124,11 @@ const BookingCalendar = ({property}) => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Book a Date Range</h2>
+      <h2 className="text-xl font-bold mb-4">{property? "Book a Date Range" : "Your Bookings"}</h2>
       <DateRange
         className="rdrCalendarWrapper"
-        ranges={[selectionRange]}
-        onChange={handleSelect}
+        ranges={property ? [selectionRange] : []}
+        onChange={property ? handleSelect : () => {}}
         minDate={new Date()}
         disabledDates={disabledDates}
         dayContentRenderer={(date) => {
@@ -145,12 +148,14 @@ const BookingCalendar = ({property}) => {
           return <div>{date.getDate()}</div>;
         }}
       />
-      <button
-        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        onClick={handleCreateBooking}
-      >
-        Create Booking
-      </button>
+      {property && (
+        <button
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          onClick={handleCreateBooking}
+        >
+          Create Booking
+        </button>
+      )}
     </div>
   );
 };
